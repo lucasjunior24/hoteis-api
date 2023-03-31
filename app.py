@@ -7,7 +7,7 @@ from resources.hotel import Hoteis, Hotel
 from resources.user import User, UserRegister, UserLogin, UserLogout
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///banco2.db'
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///db.sqlite'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["JWT_SECRET_KEY"] = 'DontTellAnyone'
 app.config["JWT_BLACKLIST_ENABLED"] = True

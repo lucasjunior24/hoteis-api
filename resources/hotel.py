@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse
 from models.hotel import HotelModel
 from flask_jwt_extended import jwt_required
 import sqlite3
+from sql_alchemy import banco
 
 
 def normalize_path_params(cidade=None, 
@@ -36,16 +37,52 @@ def normalize_path_params(cidade=None,
 class Hoteis(Resource):
     # def get(self):
     #     return {'hoteis': [hotel.json() for hotel in HotelModel.query.all()]}
-    params = reqparse.RequestParser()
-    params.add_argument('cidade', type=str, location='args')
-    params.add_argument('estrelas_min', type=float, location='args')
-    params.add_argument('estrelas_max', type=float, location='args')
-    params.add_argument('diaria_min', type=float, location='args')
-    params.add_argument('diaria_max', type=float, location='args')
-    params.add_argument('limit', type=float, location='args')
-    params.add_argument('offset', type=float, location='args')
+    path_params = reqparse.RequestParser()
+    path_params.add_argument("cidade",type=str, default="", location="args")
+    path_params.add_argument("estrelas_min",type=float, default=0, location="args")
+    path_params.add_argument("estrelas_max",type=float, default=99999, location="args")
+    path_params.add_argument("diaria_min",type=float, default=0, location="args")
+    path_params.add_argument("diaria_max",type=float, default=99999999999, location="args")
+    path_params.add_argument("page",type=float, default=1, location="args")
+    path_params.add_argument("per_page",type=float, default=100, location="args")
+    path_params.add_argument('limit', type=float, location='args')
+    path_params.add_argument('offset', type=float, location='args')
     def get(self):
-        connection = sqlite3.connect('banco2.db')
+
+        filters  = self.path_params.parse_args()
+        query = HotelModel.query
+        if filters["cidade"]:
+            query = query.filter(HotelModel.cidade == filters["cidade"])
+        if filters["estrelas_min"]:
+            query = query.filter(HotelModel.estrelas >= filters["estrelas_min"])
+        if filters["estrelas_max"]:
+            query = query.filter(HotelModel.estrelas <= filters["estrelas_max"])
+        if filters["diaria_min"]:
+            query = query.filter(HotelModel.diaria >= filters["diaria_min"])
+        if filters["diaria_max"]:
+            query = query.filter(HotelModel.diaria <= filters["diaria_max"])
+        if filters["limit"]:
+            query = query.limit(filters["limit"])
+        if filters["offset"]:
+            query = query.offset(filters["offset"])
+        # hoteis = HotelModel.query.filter(
+        #     HotelModel.estrelas > dados["estrelas_min"], 
+        #     HotelModel.estrelas < dados["estrelas_max"]).paginate(
+        #         page=dados["page"], per_page=dados["per_page"]
+        #     )
+        return {"hoteis": [hotel.json() for hotel in query]}
+    # def get(self):
+    #     return {'hoteis': [hotel.json() for hotel in HotelModel.query.all()]}
+    # params = reqparse.RequestParser()
+    # params.add_argument('cidade', type=str, location='args')
+    # params.add_argument('estrelas_min', type=float, location='args')
+    # params.add_argument('estrelas_max', type=float, location='args')
+    # params.add_argument('diaria_min', type=float, location='args')
+    # params.add_argument('diaria_max', type=float, location='args')
+    # params.add_argument('limit', type=float, location='args')
+    # params.add_argument('offset', type=float, location='args')
+    def get_all(self):
+        connection = sqlite3.connect('db.sqlite')
         cursor = connection.cursor()
         
         dados = self.params.parse_args()
@@ -53,7 +90,7 @@ class Hoteis(Resource):
         parametros = normalize_path_params(**dados_validos)
 
         if not parametros.get('cidade'):
-            consulta = "SELECT * FROM hoteis\
+            consulta = "SELECT * FROM hoteis \
             WHERE (estrelas >= ? and estrelas <= ?) \
             and (diaria >= ? and diaria <= ?) \
             LIMIT ? OFFSET ?"
@@ -62,7 +99,7 @@ class Hoteis(Resource):
             resultado = cursor.execute(consulta, tupla)
 
         else:
-            consulta = "SELECT * FROM hoteis\
+            consulta = "SELECT * FROM hoteis \
             WHERE (estrelas >= ? and estrelas <= ?) \
             and (diaria >= ? and diaria <= ?) \
             and cidade = ? LIMIT ? OFFSET ?"
@@ -73,14 +110,14 @@ class Hoteis(Resource):
         hoteis = []
         for linha in resultado:
             hoteis.append({
-            "hotel_id": linha[1],
-            "nome": linha[2],
-            "estrelas": linha[3],
-            "diaria": linha[4],
-            "cidade": linha[5]
+            "hotel_id": linha[0],
+            "nome": linha[1],
+            "estrelas": linha[2],
+            "diaria": linha[3]
         })
 
         return {'hoteis': hoteis}
+        
     
 
 class Hotel(Resource):
