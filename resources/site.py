@@ -3,6 +3,11 @@ from models.site import SiteModel
 from flask_jwt_extended import jwt_required
 
 
+class Teste(Resource):
+    def get(self):
+        return "Hello world"
+
+
 class Sites(Resource):
     def get(self):
         query = SiteModel.query

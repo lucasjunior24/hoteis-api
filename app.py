@@ -3,9 +3,9 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
 from blacklist import BLACKLIST
-from resources.hotel import Hoteis, Hotel, HoteisFiltro
+from resources.hotel import Hoteis, Hotel
 from resources.user import User, UserRegister, UserLogin, UserLogout
-from resources.site import Sites, Site
+from resources.site import Sites, Site, Teste
 
 
 app = Flask(__name__)
@@ -29,8 +29,8 @@ def verifica_blacklist(self, token):
 def token_de_acesso_invalidado(token):
     return jsonify({'message': "You have been logged out."}), 401
 
+api.add_resource(Teste, '/')
 api.add_resource(Hoteis, '/hoteis')
-api.add_resource(HoteisFiltro, '/hoteis/<string:cidade>')
 api.add_resource(Hotel, '/hoteis/<string:hotel_id>')
 
 api.add_resource(Sites, '/sites')
