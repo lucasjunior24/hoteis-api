@@ -2,43 +2,6 @@ from flask_restful import Resource, reqparse
 from models.hotel import HotelModel
 from flask_jwt_extended import jwt_required
 
-class HoteisFiltro(Resource):
-    # def get(self):
-    #     return {'hoteis': [hotel.json() for hotel in HotelModel.query.all()]}
-    path_params = reqparse.RequestParser()
-    path_params.add_argument("cidade",type=str, default="", location="args")
-    path_params.add_argument("estrelas_min",type=float, default=0, location="args")
-    path_params.add_argument("estrelas_max",type=float, default=99999, location="args")
-    path_params.add_argument("diaria_min",type=float, default=0, location="args")
-    path_params.add_argument("diaria_max",type=float, default=99999999999, location="args")
-    path_params.add_argument("page",type=float, default=1, location="args")
-    path_params.add_argument("per_page",type=float, default=100, location="args")
-    path_params.add_argument('limit', type=float, location='args')
-    path_params.add_argument('offset', type=float, location='args')
-    def get(self, cidade):
-        filters  = self.path_params.parse_args()
-
-        query = HotelModel.query.filter(HotelModel.cidade == cidade)
-        if filters["estrelas_min"]:
-            query = query.filter(HotelModel.estrelas >= filters["estrelas_min"])
-        if filters["estrelas_max"]:
-            query = query.filter(HotelModel.estrelas <= filters["estrelas_max"])
-        if filters["diaria_min"]:
-            query = query.filter(HotelModel.diaria >= filters["diaria_min"])
-        if filters["diaria_max"]:
-            query = query.filter(HotelModel.diaria <= filters["diaria_max"])
-        if filters["limit"]:
-            query = query.limit(filters["limit"])
-        if filters["offset"]:
-            query = query.offset(filters["offset"])
-        # hoteis = HotelModel.query.filter(
-        #     HotelModel.estrelas > dados["estrelas_min"], 
-        #     HotelModel.estrelas < dados["estrelas_max"]).paginate(
-        #         page=dados["page"], per_page=dados["per_page"]
-        #     )
-        return {"hoteis": [hotel.json() for hotel in query]}
-
-        
 class Hoteis(Resource):
     # def get(self):
     #     return {'hoteis': [hotel.json() for hotel in HotelModel.query.all()]}
@@ -71,7 +34,7 @@ class Hoteis(Resource):
         if filters["offset"]:
             query = query.offset(filters["offset"])
         
-        if filters["page"]:
+        if filters["per_page"]:
             query = query.paginate(
                 page=filters["page"], per_page=filters["per_page"]
             )
@@ -84,7 +47,7 @@ class Hotel(Resource):
     argumentos.add_argument("estrelas", type=float, required=True, help="The field 'estrelas' cannot be left blank.")
     argumentos.add_argument("diaria")
     argumentos.add_argument("cidade")
-
+    argumentos.add_argument("site_id", type=int, required=True, help="Every hotel needs to be linked with a site.")
 
     def get(self, hotel_id):
         hotel = HotelModel.find_hotel(hotel_id)

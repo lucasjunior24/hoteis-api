@@ -5,6 +5,8 @@ from flask_jwt_extended import JWTManager
 from blacklist import BLACKLIST
 from resources.hotel import Hoteis, Hotel, HoteisFiltro
 from resources.user import User, UserRegister, UserLogin, UserLogout
+from resources.site import Sites, Site
+
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///db.sqlite'
@@ -30,6 +32,9 @@ def token_de_acesso_invalidado(token):
 api.add_resource(Hoteis, '/hoteis')
 api.add_resource(HoteisFiltro, '/hoteis/<string:cidade>')
 api.add_resource(Hotel, '/hoteis/<string:hotel_id>')
+
+api.add_resource(Sites, '/sites')
+api.add_resource(Site, '/sites/<string:name>')
 
 api.add_resource(User, '/usuarios/<int:user_id>')
 api.add_resource(UserRegister, '/cadastro')
