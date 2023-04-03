@@ -1,6 +1,8 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
+import os
+
 
 from blacklist import BLACKLIST
 from resources.hotel import Hoteis, Hotel
@@ -45,4 +47,4 @@ api.add_resource(UserLogout, '/logout')
 if __name__ == "__main__":
     from sql_alchemy import banco
     banco.init_app(app)
-    app.run(debug=True)
+    app.run(debug=True, port=os.getenv("PORT", default=5000))
