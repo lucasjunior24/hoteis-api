@@ -1,8 +1,6 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
-import os
-
 
 from blacklist import BLACKLIST
 from resources.hotel import Hoteis, Hotel
@@ -19,10 +17,9 @@ app.config["JWT_BLACKLIST_ENABLED"] = True
 api = Api(app)
 jwt = JWTManager(app)
 
-with app.app_context():
-    @app.before_first_request
-    def cria_banco():
-        banco.create_all()
+@app.before_first_request
+def cria_banco():
+    banco.create_all()
 
 @jwt.token_in_blocklist_loader
 def verifica_blacklist(self, token):
@@ -46,7 +43,6 @@ api.add_resource(UserLogout, '/logout')
 
 
 if __name__ == "__main__":
-     with app.app_context():
-        from sql_alchemy import banco
-        banco.init_app(app)
-        app.run(debug=True, port=os.getenv("PORT", default=5000))
+    from sql_alchemy import banco
+    banco.init_app(app)
+    app.run(debug=True)
