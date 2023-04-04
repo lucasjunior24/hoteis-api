@@ -36,7 +36,7 @@ class UserRegister(Resource):
 
         if UserModel.find_by_email(dados["email"]):
             return {"message": "The User with e-mail '{}' already exists.".format(dados["email"])}, 404 #not found
-        user = UserModel( **dados)
+        user = UserModel(**dados)
         try:
             user.save_user()
         except:
