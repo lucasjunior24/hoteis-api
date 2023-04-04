@@ -2,11 +2,11 @@ from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
-from sql_alchemy import banco
 from blacklist import BLACKLIST
 from resources.hotel import Hoteis, Hotel
 from resources.user import User, UserRegister, UserLogin, UserLogout
 from resources.site import Sites, Site, Teste
+from sql_alchemy import banco
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///db.sqlite'
@@ -42,3 +42,7 @@ api.add_resource(UserLogin, '/login')
 api.add_resource(UserLogout, '/logout')
 
 
+if __name__ == "__main__":
+    from sql_alchemy import banco
+    banco.init_app(app)
+    app.run(debug=True)
