@@ -6,7 +6,6 @@ from blacklist import BLACKLIST
 from resources.hotel import Hoteis, Hotel
 from resources.user import User, UserRegister, UserLogin, UserLogout
 from resources.site import Sites, Site, Teste
-from sql_alchemy import banco
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///db.sqlite'
